@@ -16,7 +16,7 @@ local GLYPHS = {
     other    = "devices",
 }
 
-local BORDER = "#ffffff1f"
+local BORDER = "outline_variant/0.6"
 
 local cmd     = noctalia.getConfig("command") or "wireless-battery"
 local filters = noctalia.getConfig("device_filters") or {}
@@ -106,7 +106,7 @@ local function deviceCard(device)
 
     -- Divider between the device header and its details, like the Monitor card.
     if sub ~= "" or hasProgress then
-        children[#children + 1] = ui.separator({ color = "#ffffff1f", thickness = 1 })
+        children[#children + 1] = ui.separator({ color = BORDER, thickness = 1 })
     end
 
     if sub ~= "" then
@@ -122,7 +122,7 @@ local function deviceCard(device)
         -- Noctalia's own battery card uses a Surface track with a fully rounded radius.
         children[#children + 1] = ui.row({
             radius = 4,
-            border = "#ffffff14",
+            border = "outline_variant/0.5",
             borderWidth = 1,
             padding = 1,
         }, {
