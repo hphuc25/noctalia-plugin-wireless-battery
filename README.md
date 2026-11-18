@@ -29,7 +29,7 @@ Plugin id: `hphuc25/wireless-battery` · `plugin_api = 24` · current version `1
 | --- | --- |
 | Noctalia 5.x with Luau plugin support | The manifest targets `plugin_api = 24`. Older QML-only plugin builds are not supported. |
 | `wireless-battery` CLI with `--json` | The plugin runs `wireless-battery --json` and parses its JSON output. Builds without this flag will not work; see below. |
-| HID read access | The CLI reads `/dev/hidraw*`. On Arch the package installs `99-wireless-battery.rules`; when building manually, install the rule from the CLI repo's `linux/` folder and reload udev. |
+| HID read access | The CLI reads `/dev/hidraw*`. Install the `99-wireless-battery.rules` udev rule from the CLI repo's `linux/` folder and reload udev. |
 | No root for the plugin | The plugin itself runs unprivileged; only the udev rule is needed. |
 
 Check the CLI dependency with:
@@ -39,43 +39,12 @@ wireless-battery --json
 # [{"key":"...","name":"...","kind":"mouse","percent":85,...}]
 ```
 
-## Install — Arch Linux (recommended: prebuilt package)
+## Install — build the CLI from source
 
-[Arcox](https://github.com/hphuc25/my-arch-repo) publishes prebuilt `x86-64-v3`
-packages via GitHub Releases, so no local compilation is needed.
-
-> The binaries target **x86-64-v3 or newer**. Check with
-> `grep -q avx2 /proc/cpuinfo && echo ok` before adding the repo.
-
-Append to `/etc/pacman.conf`:
-
-```ini
-[arcox]
-SigLevel = Optional TrustAll
-Server = https://github.com/hphuc25/my-arch-repo/releases/download/repository
-```
-
-Then:
+Install a C++17 compiler, `make`, `pkg-config`, and the GTK4 and cairo development
+headers first (package names vary by distribution), then:
 
 ```sh
-sudo pacman -Sy
-sudo pacman -S wireless-device-battery-monitor-git
-wireless-battery --json   # must print JSON, not "Unknown option --json"
-```
-
-If the installed binary does **not** support `--json`, the repository package
-was built from an upstream revision without the JSON flag. Either rebuild the
-CLI from the [fork](https://github.com/hphuc25/Wireless-Device-Battery-Monitor)
-(`./build-linux.sh`, then set the plugin's `command` to the resulting binary) or
-wait for the repo package to be rebuilt from that fork.
-
-## Install — build the CLI from source (any Linux)
-
-```sh
-sudo pacman -S base-devel gtk4 cairo pkgconf   # Arch/CachyOS
-# Fedora: sudo dnf install gcc-c++ make gtk4-devel cairo-devel
-# Debian: sudo apt install g++ make libgtk-4-dev libcairo2-dev
-
 git clone https://github.com/hphuc25/Wireless-Device-Battery-Monitor.git
 cd Wireless-Device-Battery-Monitor
 ./build-linux.sh
