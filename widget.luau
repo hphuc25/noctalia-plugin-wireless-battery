@@ -93,6 +93,7 @@ local function copyDevice(d)
         asleep     = d.asleep,
         connected  = d.connected,
         millivolts = d.millivolts,
+        graceSec   = d.graceSec,
     }
 end
 
@@ -157,7 +158,8 @@ local function withLastKnown(data)
 
     for key, entry in pairs(lastKnown) do
         if not present[key] then
-            if entry.device.connected ~= false and now - entry.time <= grace then
+            local limit = tonumber(entry.device.graceSec) or grace
+            if entry.device.connected ~= false and now - entry.time <= limit then
                 local d = copyDevice(entry.device)
                 d.asleep = true
                 d.connected = true
