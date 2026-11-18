@@ -1,0 +1,76 @@
+id           = "hphuc25/wireless-battery"
+name         = "Wireless Battery"
+version      = "1.5.1"
+plugin_api   = 24
+author       = "hphuc25"
+license      = "GPL-3.0-or-later"
+icon         = "mouse"
+description  = "Adds the battery levels of wireless mice, keyboards and headsets to the bar, next to the built-in battery widget."
+tags         = ["battery", "mouse", "keyboard", "headset", "hardware"]
+dependencies = ["wireless-battery"]
+
+[[setting]]
+key             = "command"
+type            = "string"
+label_key       = "settings.command.label"
+description_key = "settings.command.description"
+default         = "wireless-battery"
+
+[[setting]]
+key             = "interval"
+type            = "int"
+label_key       = "settings.interval.label"
+description_key = "settings.interval.description"
+default         = 60
+min             = 5
+max             = 3600
+step            = 5
+
+[[setting]]
+key             = "visibility"
+type            = "select"
+label_key       = "settings.visibility.label"
+description_key = "settings.visibility.description"
+default         = "dynamic"
+options         = [
+    { value = "dynamic", label_key = "settings.visibility.dynamic" },
+    { value = "static",  label_key = "settings.visibility.static" },
+]
+
+[[setting]]
+key             = "device_filters"
+type            = "string_list"
+label_key       = "settings.devices.label"
+description_key = "settings.devices.description"
+default         = []
+
+[[setting]]
+key             = "grace"
+type            = "int"
+label_key       = "settings.grace.label"
+description_key = "settings.grace.description"
+default         = 1800
+min             = 0
+max             = 86400
+step            = 60
+
+[[setting]]
+key             = "mode"
+type            = "select"
+label_key       = "settings.mode.label"
+description_key = "settings.mode.description"
+default         = "all"
+options         = [
+    { value = "all",    label_key = "settings.mode.all" },
+    { value = "lowest", label_key = "settings.mode.lowest" },
+]
+
+[[widget]]
+id    = "status"
+entry = "widget.luau"
+
+[[panel]]
+id     = "devices"
+entry  = "panel.luau"
+width  = 440
+height = 420
