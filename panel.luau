@@ -102,6 +102,13 @@ local function deviceCard(device)
     }
 
     local sub = subtitle(device)
+    local hasProgress = device.percent ~= nil and device.percent >= 0
+
+    -- Divider between the device header and its details, like the Monitor card.
+    if sub ~= "" or hasProgress then
+        children[#children + 1] = ui.separator({ color = "#ffffff1f", thickness = 1 })
+    end
+
     if sub ~= "" then
         children[#children + 1] = ui.label({
             text = sub,
@@ -111,7 +118,7 @@ local function deviceCard(device)
         })
     end
 
-    if device.percent ~= nil and device.percent >= 0 then
+    if hasProgress then
         children[#children + 1] = ui.progress({
             progress = math.clamp(device.percent / 100, 0, 1),
             height = 6,
