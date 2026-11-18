@@ -119,11 +119,21 @@ local function deviceCard(device)
     end
 
     if hasProgress then
-        children[#children + 1] = ui.progress({
-            progress = math.clamp(device.percent / 100, 0, 1),
-            height = 6,
-            radius = 3,
-            fill = color,
+        -- Noctalia's own battery card uses a Surface track with a fully rounded radius.
+        children[#children + 1] = ui.row({
+            radius = 4,
+            border = "#ffffff14",
+            borderWidth = 1,
+            padding = 1,
+        }, {
+            ui.progress({
+                progress = math.clamp(device.percent / 100, 0, 1),
+                height = 6,
+                radius = 3,
+                fill = color,
+                flexGrow = 1,
+                track = "surface",
+            }),
         })
     end
 

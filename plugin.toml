@@ -1,6 +1,6 @@
 id           = "hphuc25/wireless-battery"
 name         = "Wireless Battery"
-version      = "1.5.1"
+version      = "1.5.2"
 plugin_api   = 24
 author       = "hphuc25"
 license      = "GPL-3.0-or-later"
