@@ -11,9 +11,10 @@
 -- visibility: dynamic hides the widget when no device is connected;
 --             static keeps it visible and shows "<glyph> ?".
 --
--- Sleeping mice answer the receiver with no battery value, so `--json` can
--- report percent = -1 or drop the device entirely for a few seconds. The last
--- known level is kept for `grace` seconds, matching the desktop app's behaviour.
+-- A sleeping mouse still appears in `--json` with percent = -1: its last real
+-- level is shown for `grace` seconds. A device that disappears from the poll
+-- (receiver unplugged / switched off) is dropped immediately so no stale
+-- percentage is left on the bar.
 --
 -- Left-click opens a detail panel; right-click forces a refresh.
 
@@ -138,8 +139,12 @@ local function withLastKnown(data)
             if d.percent ~= nil and d.percent >= 0 then
                 lastKnown[key] = { device = copyDevice(d), time = now }
             else
+                -- Device is still reported by its receiver but gave no level: use the
+                -- last real reading for `grace` seconds. Do NOT extend the timestamp,
+                -- otherwise a sleeping mouse would stay stale forever.
                 local cached = lastKnown[key]
-                if cached then
+                local limit = tonumber(d.graceSec) or grace
+                if cached and now - cached.time <= limit then
                     d.percent    = cached.device.percent
                     d.level      = cached.device.level
                     d.detail     = cached.device.detail
@@ -149,26 +154,16 @@ local function withLastKnown(data)
                     d.charging   = false
                     d.asleep     = true
                     d.connected  = true
-                    cached.time  = now
                 end
             end
             result[#result + 1] = d
         end
     end
 
-    for key, entry in pairs(lastKnown) do
-        if not present[key] then
-            local limit = tonumber(entry.device.graceSec) or grace
-            if entry.device.connected ~= false and now - entry.time <= limit then
-                local d = copyDevice(entry.device)
-                d.asleep = true
-                d.connected = true
-                d.charging = false
-                result[#result + 1] = d
-            else
-                lastKnown[key] = nil
-            end
-        end
+    -- A device missing from this poll is gone (receiver unplugged / device off):
+    -- drop its cached level immediately instead of showing a stale percentage.
+    for key in pairs(lastKnown) do
+        if not present[key] then lastKnown[key] = nil end
     end
 
     saveCache()

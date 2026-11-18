@@ -18,8 +18,9 @@ untouched — this plugin only appends the peripheral devices.
   close button and one bordered card per device (connection, detail breakdown,
   charge bar).
 * **Right click** — poll the devices immediately.
-* Sleeping mice keep their last known level for a configurable grace period, so
-  the widget does not flicker or disappear every time the mouse goes to sleep.
+* A sleeping mouse that is still reported by its receiver keeps its last known
+  level for `grace` seconds. When a device disappears from a poll (receiver
+  unplugged or switched off), its cached level is dropped immediately.
 
 Plugin id: `hphuc25/wireless-battery` · `plugin_api = 24` · current version `1.5.1`.
 
@@ -111,8 +112,10 @@ noctalia msg config-set 'plugin_settings."hphuc25/wireless-battery".grace' 600
 
 * **Nothing appears** — run `wireless-battery --json`. It must print a JSON
   array. If it prints `Unknown option --json`, install a newer CLI (see above).
-* **Device shows `?` / disappears** — the device is off, asleep or out of range.
-  Increase `grace`, or switch `visibility` to `static` to always see a placeholder.
+* **Device shows `?` / disappears** — the device is off or out of range. If its
+  receiver still sees it as asleep, increase `grace`; otherwise the level was
+  dropped because the device is no longer reported. `visibility = static` always
+  shows a `?` placeholder.
 * **No HID access** — install the udev rule from the CLI repo and re-plug the
   receiver. `ls /dev/hidraw*` should list the receiver.
 * **Panel opens behind a window** — set
