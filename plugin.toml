@@ -1,10 +1,10 @@
 id           = "hphuc25/wireless-battery"
 name         = "Wireless Battery"
-version      = "1.5.2"
-plugin_api   = 24
+version      = "1.5.3"
+plugin_api   = 43
 author       = "hphuc25"
 license      = "GPL-3.0-or-later"
-icon         = "mouse"
+icon         = "battery-3"
 description  = "Adds the battery levels of wireless mice, keyboards and headsets to the bar, next to the built-in battery widget."
 tags         = ["battery", "mouse", "keyboard", "headset", "hardware"]
 dependencies = ["wireless-battery"]
