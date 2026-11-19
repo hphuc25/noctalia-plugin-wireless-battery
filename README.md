@@ -1,28 +1,6 @@
 # Wireless Battery — Noctalia plugin
 
-A Noctalia bar widget that adds the battery levels of **wireless mice, keyboards,
-headsets, gamepads and phones** right next to the built-in battery widget. The
-stock battery widget, its tooltip and the Control Center Power tab are left
-untouched — this plugin only appends the peripheral devices.
-
-```
-[⌁ 100%]   [🖱 85%]   [🎧 40% ⚡]
- built-in     └──── this plugin ────┘
-```
-
-* **Bar** — one `glyph + percentage` row per device, in the same style as the
-  built-in battery widget. Charging devices get the same cyan bolt; devices at
-  or below 15% turn red.
-* **Tooltip** — device name and level, with `charging` / `asleep` markers.
-* **Left click** — a panel styled like Noctalia's Power tab: a header with a
-  close button and one bordered card per device (connection, detail breakdown,
-  charge bar).
-* **Right click** — poll the devices immediately.
-* A sleeping mouse that is still reported by its receiver keeps its last known
-  level for `grace` seconds. When a device disappears from a poll (receiver
-  unplugged or switched off), its cached level is dropped immediately.
-
-Plugin id: `hphuc25/wireless-battery` · `plugin_api = 24` · current version `1.5.1`.
+A Noctalia bar widget that shows the battery percentage of wireless mice and headsets.
 
 ## Requirements / dependencies
 
@@ -30,7 +8,7 @@ Plugin id: `hphuc25/wireless-battery` · `plugin_api = 24` · current version `1
 | --- | --- |
 | Noctalia 5.x with Luau plugin support | The manifest targets `plugin_api = 24`. Older QML-only plugin builds are not supported. |
 | `wireless-battery` CLI with `--json` | The plugin runs `wireless-battery --json` and parses its JSON output. Builds without this flag will not work; see below. |
-| HID read access | The CLI reads `/dev/hidraw*`. Install the `99-wireless-battery.rules` udev rule from the CLI repo's `linux/` folder and reload udev. |
+| HID read access | The CLI reads `/dev/hidraw*`. Install `linux/99-wireless-battery.rules` from the CLI repo to `/usr/lib/udev/rules.d/`, run `sudo udevadm control --reload-rules && sudo udevadm trigger`, then re-plug the receiver. Check with `ls /dev/hidraw*`. |
 | No root for the plugin | The plugin itself runs unprivileged; only the udev rule is needed. |
 
 Check the CLI dependency with:
@@ -46,7 +24,7 @@ Install a C++17 compiler, `make`, `pkg-config`, and the GTK4 and cairo developme
 headers first (package names vary by distribution), then:
 
 ```sh
-git clone https://github.com/hphuc25/Wireless-Device-Battery-Monitor.git
+git clone https://github.com/krisgfx9/Wireless-Device-Battery-Monitor.git
 cd Wireless-Device-Battery-Monitor
 ./build-linux.sh
 sudo install -Dm755 wireless-battery /usr/local/bin/wireless-battery
