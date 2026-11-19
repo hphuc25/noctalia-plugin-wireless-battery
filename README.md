@@ -88,6 +88,9 @@ noctalia msg config-set 'plugin_settings."hphuc25/wireless-battery".grace' 600
 
 ## Troubleshooting
 
+* **CLI missing** — the plugin shows a warning on the bar and sends a desktop
+  notification with the install link. The detail panel also offers an **Open
+  install guide** button (uses `xdg-open`).
 * **Nothing appears** — run `wireless-battery --json`. It must print a JSON
   array. If it prints `Unknown option --json`, install a newer CLI (see above).
 * **Device shows `?` / disappears** — the device is off or out of range. If its

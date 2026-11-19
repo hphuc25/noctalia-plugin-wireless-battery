@@ -16,11 +16,15 @@
   "panel.title": "Power",
   "panel.empty": "No wireless devices with battery information found.",
   "panel.refresh": "Refresh",
-  "panel.missing": "wireless-battery was not found. Install it, or set the command path in the plugin settings.",
+  "panel.missing": "wireless-battery not found. Install it from {url} or set the command path in the plugin settings.",
   "status.charging": "charging",
   "status.asleep": "asleep",
   "tooltip.empty": "No wireless devices",
   "panel.close": "Close",
   "settings.grace.label": "Keep last level",
-  "settings.grace.description": "Seconds to keep the last known battery level while a device is asleep or temporarily missing. 0 disables it."
+  "settings.grace.description": "Seconds to keep the last known battery level while a device is asleep or temporarily missing. 0 disables it.",
+  "panel.cli_title": "CLI not found",
+  "panel.cli_action": "Open install guide",
+  "notify.missing.title": "Wireless Battery CLI missing",
+  "notify.missing.body": "Install 'wireless-battery' from {url}, or set the command path in the plugin settings."
 }

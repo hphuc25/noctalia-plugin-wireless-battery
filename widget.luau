@@ -19,6 +19,7 @@
 -- Left-click opens a detail panel; right-click forces a refresh.
 
 local PANEL_ID = "hphuc25/wireless-battery:devices"
+local INSTALL_URL = "https://github.com/krisgfx9/Wireless-Device-Battery-Monitor"
 local LOW_THRESHOLD = 15
 
 local GLYPHS = {
@@ -44,6 +45,28 @@ local lastKnown = {}
 local devices = {}
 local busy = false
 local missing = false
+local notifiedMissing = false
+
+local function cliAvailable()
+    if cmd:sub(1, 1) == "/" or cmd:sub(1, 2) == "~/" then
+        return noctalia.fileExists(noctalia.expandPath(cmd))
+    end
+    return noctalia.commandExists(cmd)
+end
+
+local function setMissing(value)
+    if value and not missing and not notifiedMissing then
+        noctalia.notifyError(
+            noctalia.tr("notify.missing.title"),
+            noctalia.tr("notify.missing.body", { url = INSTALL_URL })
+        )
+        notifiedMissing = true
+    elseif not value then
+        notifiedMissing = false
+    end
+    missing = value
+    noctalia.state.set("cli_missing", missing)
+end
 
 local function lower(s)
     return string.lower(type(s) == "string" and s or "")
@@ -234,7 +257,7 @@ local function render()
             ui.glyph({ name = "alert-triangle", size = 14, color = "error" }),
             ui.label({ text = "no cli", color = "error" }),
         }))
-        barWidget.setTooltip(noctalia.tr("panel.missing"))
+        barWidget.setTooltip(noctalia.tr("panel.missing", { url = INSTALL_URL }))
         return
     end
 
@@ -280,6 +303,8 @@ local function refresh()
         if result.exitCode ~= 0 then
             noctalia.log("wireless-battery: exit " .. tostring(result.exitCode) .. ": "
                 .. tostring(result.stderr))
+            setMissing(true)
+            render()
             return
         end
         local data, err = noctalia.json.decode(result.stdout)
@@ -287,12 +312,16 @@ local function refresh()
             noctalia.log("wireless-battery: bad JSON: " .. tostring(err))
             return
         end
-        missing = false
+        setMissing(false)
         devices = withLastKnown(data)
         noctalia.state.set("devices", devices)
         render()
     end)
-    if not started then busy = false end
+    if not started then
+        busy = false
+        setMissing(true)
+        render()
+    end
 end
 
 function update()
@@ -318,7 +347,7 @@ function onConfigChanged()
     visibility = noctalia.getConfig("visibility") or "dynamic"
     filters    = noctalia.getConfig("device_filters") or {}
     grace      = tonumber(noctalia.getConfig("grace")) or 1800
-    missing    = not noctalia.commandExists(cmd)
+    setMissing(not cliAvailable())
     noctalia.setUpdateInterval(interval * 1000)
     render()
     refresh()
@@ -327,8 +356,6 @@ end
 noctalia.setUpdateInterval(interval * 1000)
 loadCache()
 
-if not noctalia.commandExists(cmd) then
-    missing = true
-end
+setMissing(not cliAvailable())
 render()
 refresh()

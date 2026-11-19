@@ -18,10 +18,13 @@ local GLYPHS = {
 
 local BORDER = "outline_variant/0.6"
 
+local INSTALL_URL = "https://github.com/krisgfx9/Wireless-Device-Battery-Monitor"
+
 local cmd     = noctalia.getConfig("command") or "wireless-battery"
 local filters = noctalia.getConfig("device_filters") or {}
 
 local devices = {}
+local cliMissing = false
 local open = false
 local busy = false
 
@@ -148,7 +151,54 @@ local function deviceCard(device)
     }, children)
 end
 
+local function missingCard()
+    return ui.column({
+        gap = 10,
+        padding = 13,
+        radius = 12,
+        fill = "surface_container",
+        border = BORDER,
+        borderWidth = 1,
+    }, {
+        ui.label({
+            text = noctalia.tr("panel.cli_title"),
+            fontWeight = "bold",
+            fontSize = 13,
+            color = "error",
+        }),
+        ui.label({
+            text = noctalia.tr("panel.missing", { url = INSTALL_URL }),
+            fontSize = 11,
+            color = "on_surface_variant",
+            maxLines = 4,
+        }),
+        ui.button({
+            text = noctalia.tr("panel.cli_action"),
+            variant = "primary",
+            controlSize = "sm",
+            onClick = "onOpenGuide",
+        }),
+    })
+end
+
 local function render()
+    if cliMissing then
+        panel.render(ui.column({ gap = 12, padding = 14, flexGrow = 1 }, {
+            ui.row({ align = "center", justify = "space_between" }, {
+                ui.label({ text = noctalia.tr("panel.title"), fontWeight = "bold", fontSize = 16 }),
+                ui.button({
+                    glyph = "x",
+                    variant = "ghost",
+                    controlSize = "sm",
+                    tooltip = noctalia.tr("panel.close"),
+                    onClick = "onCloseButton",
+                }),
+            }),
+            missingCard(),
+        }))
+        return
+    end
+
     local cards = {}
     for _, device in ipairs(devices) do
         if device.connected ~= false and isSelected(device) then
@@ -215,6 +265,10 @@ function onCloseButton()
     panel.close()
 end
 
+function onOpenGuide()
+    noctalia.runAsync({ "xdg-open", INSTALL_URL })
+end
+
 function onConfigChanged()
     cmd     = noctalia.getConfig("command") or "wireless-battery"
     filters = noctalia.getConfig("device_filters") or {}
@@ -225,8 +279,9 @@ function onOpen()
     open = true
     local cached = noctalia.state.get("devices")
     if type(cached) == "table" then devices = cached end
+    cliMissing = noctalia.state.get("cli_missing") == true
     render()
-    refresh()
+    if not cliMissing then refresh() end
 end
 
 function onClose()
@@ -236,5 +291,10 @@ end
 noctalia.state.watch("devices", function(value)
     if type(value) ~= "table" then return end
     devices = value
+    if open then render() end
+end)
+
+noctalia.state.watch("cli_missing", function(value)
+    cliMissing = value == true
     if open then render() end
 end)
